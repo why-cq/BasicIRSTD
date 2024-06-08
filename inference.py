@@ -52,8 +52,11 @@ def test():
     with torch.no_grad():
         for idx_iter, (img, size, img_dir) in tqdm(enumerate(test_loader)):
             img = Variable(img).cuda()
-            pred = net.forward(img)
-            pred = pred[:,:,:size[0],:size[1]]        
+            if size[0] <= 2048 and size[1] <= 2048:
+                pred = net.forward(img)
+                pred = pred[:, :, :size[0], :size[1]]
+            else:
+                pred = torch.zeros(1, 1, size[0], size[1]).cuda()      
             ### save img
             if opt.save_img == True:
                 img_save = transforms.ToPILImage()(((pred[0,0,:,:]>opt.threshold).float()).cpu())
