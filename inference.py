@@ -56,7 +56,21 @@ def test():
                 pred = net.forward(img)
                 pred = pred[:, :, :size[0], :size[1]]
             else:
-                pred = torch.zeros(1, 1, size[0], size[1]).cuda()      
+                # 大于2048,分割原始图像,然后进入网络,出来后进行合并
+                # pred = torch.zeros(1,1,size[0],size[1]).cuda()
+                rows = []
+                for i in range(0, size[0], 512):
+                    cols = []
+                    for j in range(0, size[1], 512):
+                        segment = img[:, :, i:min(i + 512, size[0]), j:min(j + 512, size[1])]
+                        pred = net.forward(segment)
+                        cols.append(pred)
+                    col_combined = torch.cat(cols, dim=3)
+                    rows.append(col_combined)
+
+                # Combine the rows into a single tensor
+                pred = torch.cat(rows, dim=2)
+                pred = pred[:, :, :size[0], :size[1]]
             ### save img
             if opt.save_img == True:
                 img_save = transforms.ToPILImage()(((pred[0,0,:,:]>opt.threshold).float()).cpu())
