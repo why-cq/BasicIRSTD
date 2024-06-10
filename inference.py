@@ -71,6 +71,11 @@ def test():
                 # Combine the rows into a single tensor
                 pred = torch.cat(rows, dim=2)
                 pred = pred[:, :, :size[0], :size[1]]
+                #get top 15
+                top_values, top_indices = torch.topk(pred.view(-1), 15)
+                filtered_tensor = torch.zeros_like(pred)
+                filtered_tensor.view(-1)[top_indices] = top_values
+                pred = filtered_tensor.view(1,1,size[0],size[1])
             ### save img
             if opt.save_img == True:
                 img_save = transforms.ToPILImage()(((pred[0,0,:,:]>opt.threshold).float()).cpu())
