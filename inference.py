@@ -52,6 +52,7 @@ def test():
     with torch.no_grad():
         for idx_iter, (img, size, img_dir) in tqdm(enumerate(test_loader)):
             img = Variable(img).cuda()
+
             if size[0] <= 2048 and size[1] <= 2048:
                 pred = net.forward(img)
                 pred = pred[:, :, :size[0], :size[1]]
@@ -59,10 +60,11 @@ def test():
                 # 大于2048,分割原始图像,然后进入网络,出来后进行合并
                 # pred = torch.zeros(1,1,size[0],size[1]).cuda()
                 rows = []
-                for i in range(0, size[0], 512):
+                split_size = 2048
+                for i in range(0, size[0], split_size):
                     cols = []
-                    for j in range(0, size[1], 512):
-                        segment = img[:, :, i:min(i + 512, size[0]), j:min(j + 512, size[1])]
+                    for j in range(0, size[1], patch_size):
+                        segment = img[:, :, i:min(i + split_size, size[0]), j:min(j + split_size, size[1])]
                         pred = net.forward(segment)
                         cols.append(pred)
                     col_combined = torch.cat(cols, dim=3)
