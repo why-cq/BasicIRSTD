@@ -60,7 +60,7 @@ def test():
                 # 大于2048,分割原始图像,然后进入网络,出来后进行合并
                 # pred = torch.zeros(1,1,size[0],size[1]).cuda()
                 rows = []
-                split_size = 1024
+                split_size = 2048
                 for i in range(0, size[0], split_size):
                     cols = []
                     for j in range(0, size[1], patch_size):
