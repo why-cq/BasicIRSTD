@@ -28,7 +28,7 @@ parser.add_argument("--img_norm_cfg_std", default=None, type=float,
 parser.add_argument("--save_img", default=True, type=bool, help="save image of or not")
 parser.add_argument("--save_img_dir", type=str, default='./results/', help="path of saved image")
 parser.add_argument("--save_log", type=str, default='./log/', help="path of saved .pth")
-parser.add_argument("--threshold", type=float, default=0.5)
+parser.add_argument("--threshold", type=float, default=0.3)
 
 global opt
 opt = parser.parse_args()
@@ -75,7 +75,7 @@ def test():
                 pred = torch.cat(rows, dim=2)
                 pred = pred[:, :, :size[0], :size[1]]
                 # get top 15
-                top_values, top_indices = torch.topk(pred.view(-1), 30)
+                top_values, top_indices = torch.topk(pred.view(-1), 15)
                 filtered_tensor = torch.zeros_like(pred)
                 filtered_tensor.view(-1)[top_indices] = top_values
                 pred = filtered_tensor.view(1, 1, size[0], size[1])
